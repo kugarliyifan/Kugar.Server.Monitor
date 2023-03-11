@@ -1,0 +1,91 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33103.184
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kugar.Server.MonitorServer", "Kugar.Server.MonitorServer\Kugar.Server.MonitorServer.csproj", "{AC846D25-7DDF-4191-B28F-04B25D6853B6}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Collectors", "Collectors", "{3DB7C1E5-71B0-417F-A3F4-665E0C39EB85}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kugar.Server.MonitorCollectorRunner", "Kugar.Server.MonitorCollectorRunner\Kugar.Server.MonitorCollectorRunner.csproj", "{F5A651E7-2D07-4DA0-B22E-7C0B0862BB00}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kugar.Server.MonitorCollectors.WindowsEvent", "Collectors\Kugar.Server.MonitorCollectors.WindowsEvent\Kugar.Server.MonitorCollectors.WindowsEvent.csproj", "{8878DF91-3CB5-4BC2-A6B2-CB25AE35F250}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kugar.Server.MonitorCollectors.Core", "Collectors\Kugar.Server.MonitorCollectors.Core\Kugar.Server.MonitorCollectors.Core.csproj", "{0056D79D-5A38-4B1E-8EBC-69A1B60783B2}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kugar.MonitorCollector.Tester", "Kugar.MonitorCollector.Tester\Kugar.MonitorCollector.Tester.csproj", "{B5C3BA95-CE58-4A84-B8AC-4BDD077F5477}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kugar.Server.MonitorCollectors.SystemData", "Collectors\Kugar.Server.MonitorCollectors.SystemData\Kugar.Server.MonitorCollectors.SystemData.csproj", "{8D6AD961-808A-4C7A-B9EF-12C60ACE8398}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Servers", "Servers", "{1AA26664-36E9-4CD3-B348-A4FCB979860E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Clients", "Clients", "{BC910CE2-2B2C-49B1-AB57-F5C1D402315D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kugar.Server.MonitorCollectors.SQLServer", "Collectors\Kugar.Server.MonitorCollectors.SQLServer\Kugar.Server.MonitorCollectors.SQLServer.csproj", "{400ED3A7-1626-4FB3-BED7-10717D4FD7CC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kugar.Server.MonitorCollectors.Redis", "Collectors\Kugar.Server.MonitorCollectors.Redis\Kugar.Server.MonitorCollectors.Redis.csproj", "{F60ACE87-FD05-4597-A93B-AEDB36A125AB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kugar.Server.MonitorCollectors.InfluxDb", "Kugar.Server.MonitorCollectors.InfluxDb\Kugar.Server.MonitorCollectors.InfluxDb.csproj", "{9C7F3859-1C5C-46D0-B9EE-B1934820F32B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AC846D25-7DDF-4191-B28F-04B25D6853B6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AC846D25-7DDF-4191-B28F-04B25D6853B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AC846D25-7DDF-4191-B28F-04B25D6853B6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AC846D25-7DDF-4191-B28F-04B25D6853B6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F5A651E7-2D07-4DA0-B22E-7C0B0862BB00}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F5A651E7-2D07-4DA0-B22E-7C0B0862BB00}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F5A651E7-2D07-4DA0-B22E-7C0B0862BB00}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F5A651E7-2D07-4DA0-B22E-7C0B0862BB00}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8878DF91-3CB5-4BC2-A6B2-CB25AE35F250}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8878DF91-3CB5-4BC2-A6B2-CB25AE35F250}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8878DF91-3CB5-4BC2-A6B2-CB25AE35F250}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8878DF91-3CB5-4BC2-A6B2-CB25AE35F250}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0056D79D-5A38-4B1E-8EBC-69A1B60783B2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0056D79D-5A38-4B1E-8EBC-69A1B60783B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0056D79D-5A38-4B1E-8EBC-69A1B60783B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0056D79D-5A38-4B1E-8EBC-69A1B60783B2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B5C3BA95-CE58-4A84-B8AC-4BDD077F5477}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B5C3BA95-CE58-4A84-B8AC-4BDD077F5477}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B5C3BA95-CE58-4A84-B8AC-4BDD077F5477}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B5C3BA95-CE58-4A84-B8AC-4BDD077F5477}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8D6AD961-808A-4C7A-B9EF-12C60ACE8398}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8D6AD961-808A-4C7A-B9EF-12C60ACE8398}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8D6AD961-808A-4C7A-B9EF-12C60ACE8398}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8D6AD961-808A-4C7A-B9EF-12C60ACE8398}.Release|Any CPU.Build.0 = Release|Any CPU
+		{400ED3A7-1626-4FB3-BED7-10717D4FD7CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{400ED3A7-1626-4FB3-BED7-10717D4FD7CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{400ED3A7-1626-4FB3-BED7-10717D4FD7CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{400ED3A7-1626-4FB3-BED7-10717D4FD7CC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F60ACE87-FD05-4597-A93B-AEDB36A125AB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F60ACE87-FD05-4597-A93B-AEDB36A125AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F60ACE87-FD05-4597-A93B-AEDB36A125AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F60ACE87-FD05-4597-A93B-AEDB36A125AB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9C7F3859-1C5C-46D0-B9EE-B1934820F32B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9C7F3859-1C5C-46D0-B9EE-B1934820F32B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9C7F3859-1C5C-46D0-B9EE-B1934820F32B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9C7F3859-1C5C-46D0-B9EE-B1934820F32B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{AC846D25-7DDF-4191-B28F-04B25D6853B6} = {1AA26664-36E9-4CD3-B348-A4FCB979860E}
+		{3DB7C1E5-71B0-417F-A3F4-665E0C39EB85} = {BC910CE2-2B2C-49B1-AB57-F5C1D402315D}
+		{F5A651E7-2D07-4DA0-B22E-7C0B0862BB00} = {BC910CE2-2B2C-49B1-AB57-F5C1D402315D}
+		{8878DF91-3CB5-4BC2-A6B2-CB25AE35F250} = {3DB7C1E5-71B0-417F-A3F4-665E0C39EB85}
+		{0056D79D-5A38-4B1E-8EBC-69A1B60783B2} = {3DB7C1E5-71B0-417F-A3F4-665E0C39EB85}
+		{B5C3BA95-CE58-4A84-B8AC-4BDD077F5477} = {BC910CE2-2B2C-49B1-AB57-F5C1D402315D}
+		{8D6AD961-808A-4C7A-B9EF-12C60ACE8398} = {3DB7C1E5-71B0-417F-A3F4-665E0C39EB85}
+		{400ED3A7-1626-4FB3-BED7-10717D4FD7CC} = {3DB7C1E5-71B0-417F-A3F4-665E0C39EB85}
+		{F60ACE87-FD05-4597-A93B-AEDB36A125AB} = {3DB7C1E5-71B0-417F-A3F4-665E0C39EB85}
+		{9C7F3859-1C5C-46D0-B9EE-B1934820F32B} = {3DB7C1E5-71B0-417F-A3F4-665E0C39EB85}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A2463B78-B1A6-4304-B439-D21DD22D3CE4}
+	EndGlobalSection
+EndGlobal
