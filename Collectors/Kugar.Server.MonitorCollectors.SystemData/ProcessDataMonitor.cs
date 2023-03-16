@@ -15,11 +15,10 @@ namespace Kugar.Server.MonitorCollectors.SystemData
 
         public ProcessDataMonitor(IServiceProvider provider) : base(provider)
         {
-            Enabled = CustomConfigManager.Default["SystemData:Process:Enabled"].ToBool(true);
-            Internal=CustomConfigManager.Default["SystemData:Process:Internal"].ToInt(60) * 1000;
+            this.Enabled = CustomConfigManager.Default.GetValue<bool>("SystemData:Process:Enabled",true);
+            Internal=CustomConfigManager.Default.GetValue<int>("SystemData:Process:Internal",60) * 1000;
 
-            var processIds = CustomConfigManager.Default["SystemData:Process:ProcessIds"]?.Split(',').ToArrayEx() ??
-                          Array.Empty<string>();
+            var processIds = CustomConfigManager.Default.GetValue<List<string>>("SystemData:Process:ProcessIds");
 
             if (processIds.HasData())
             {
@@ -125,7 +124,7 @@ namespace Kugar.Server.MonitorCollectors.SystemData
 
 
 
-    public class ProcessDataEventData : EventDataBase
+    public class ProcessDataEventData : IEventDataBase
     {
         public string ProcessName { get; set; }
 
@@ -137,16 +136,8 @@ namespace Kugar.Server.MonitorCollectors.SystemData
 
         public string UserName { set; get; }
 
-        public override string TypeId { get; } = "ProcessData";
-
-        public override JObject Serialize()
-        {
-            return JObject.FromObject(this);
-        }
-
-        public override void LoadFrom(string json)
-        {
-            throw new NotImplementedException();
-        }
+        public string TypeId { get; } = "ProcessData";
+        public DateTime EventDt { get; set; }
+        
     }
 }

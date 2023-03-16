@@ -31,6 +31,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Collectors\Kugar.Server.MonitorCollectors.Redis\Kugar.Server.MonitorCollectors.Redis.csproj" />
+    <ProjectReference Include="..\Collectors\Kugar.Server.MonitorCollectors.SQLServer\Kugar.Server.MonitorCollectors.SQLServer.csproj" />
     <ProjectReference Include="..\Collectors\Kugar.Server.MonitorCollectors.SystemData\Kugar.Server.MonitorCollectors.SystemData.csproj" />
     <ProjectReference Include="..\Collectors\Kugar.Server.MonitorCollectors.WindowsEvent\Kugar.Server.MonitorCollectors.WindowsEvent.csproj" />
   </ItemGroup>

@@ -1,4 +1,5 @@
-﻿using Kugar.Core.ExtMethod;
+﻿using Kugar.Core.Configuration;
+using Kugar.Core.ExtMethod;
 using Kugar.Server.MonitorCollectorRunner.Submitters;
 using Kugar.Server.MonitorCollectors.Core;
 using Microsoft.Extensions.Configuration;
@@ -25,10 +26,7 @@ namespace Kugar.Server.MonitorCollectorRunner
                     //services.AddHostedService<MachineDataMonitor>();
                     //services.AddHostedService<WindowsEventLogCollector>();
                     //services.AddHostedService<WindowsEventLogTest>();
-                    var plugins = hostContext.Configuration.GetSection("plugins")
-                        .GetChildren()
-                        .Select(x => x.Value)
-                        .ToArrayEx();
+                    var plugins =CustomConfigManager.Default.GetArray<string>("plugins");
 
                     services.AddSingleton<IDataSubmitter, HttpSubmitter>();
 

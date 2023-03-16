@@ -81,7 +81,7 @@ namespace Kugar.Server.MonitorCollectors.SystemData
 
         }
 
-        public class FolderEventData : EventDataBase
+        public class FolderEventData : IEventDataBase
         {
             public string Path { set; get; }
 
@@ -89,14 +89,15 @@ namespace Kugar.Server.MonitorCollectors.SystemData
 
             public double FreeSpace { set; get; }
 
-            public override string TypeId => "DiskData";
+            public string TypeId => "DiskData";
+            public DateTime EventDt { get; set; }
 
-            public override JObject Serialize()
+            public JObject Serialize()
             {
                 return JObject.FromObject(this);
             }
 
-            public override void LoadFrom(string json)
+            public void LoadFrom(string json)
             {
                 throw new NotImplementedException();
             }

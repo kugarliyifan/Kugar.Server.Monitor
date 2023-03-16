@@ -76,9 +76,10 @@ namespace Kugar.Server.MonitorCollectors.WindowsEvent
         }
     }
 
-    public class WindowsEventLogEventData : EventDataBase
+    public class WindowsEventLogEventData : IEventDataBase
     {
-        public override string TypeId => "WindowsEventLog";
+        public string TypeId => "WindowsEventLog";
+        public DateTime EventDt { get; set; }
 
         public long? RecordId { set; get; }
 
@@ -97,12 +98,7 @@ namespace Kugar.Server.MonitorCollectors.WindowsEvent
 
         public string Exception { set; get; }
         
-        public override JObject Serialize()
-        {
-            return JObject.FromObject(this);
-        }
-
-        public override void LoadFrom(string json)
+        public void LoadFrom(string json)
         {
             var j = JObject.Parse(json);
 

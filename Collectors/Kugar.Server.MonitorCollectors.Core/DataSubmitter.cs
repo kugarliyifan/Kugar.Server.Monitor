@@ -10,12 +10,12 @@ namespace Kugar.Server.MonitorCollectors.Core
 {
     public interface IDataSubmitter
     {
-        Task Submit(IEnumerable<EventDataBase> dataList);
+        Task Submit(IEnumerable<IEventDataBase> dataList);
     }
 
     public class DataSubmitter:IDataSubmitter
     {
-        public async Task Submit(IEnumerable<EventDataBase> dataList)
+        public async Task Submit(IEnumerable<IEventDataBase> dataList)
         {
             foreach (var item in dataList)
             {

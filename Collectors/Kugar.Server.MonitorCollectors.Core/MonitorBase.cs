@@ -7,7 +7,7 @@ namespace Kugar.Server.MonitorCollectors.Core;
 
 public abstract class MonitorBase:TimerHostedService, IDisposable
 {
-    protected abstract Task Submit(IEnumerable<EventDataBase> data);
+    protected abstract Task Submit(IEnumerable<IEventDataBase> data);
       
      
     public abstract string TypeId { set; get; }
@@ -38,7 +38,7 @@ public abstract class SelfSubmitMonitorBase:MonitorBase
 /// </summary>
 public abstract class UniformSubmitMonitorBase : MonitorBase
 {
-    protected override async Task Submit(IEnumerable<EventDataBase> data)
+    protected override async Task Submit(IEnumerable<IEventDataBase> data)
     {
         var p = (IDataSubmitter)Provider.GetService(typeof(IDataSubmitter));
 

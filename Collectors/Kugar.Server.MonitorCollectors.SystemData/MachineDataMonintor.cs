@@ -156,9 +156,10 @@ namespace Kugar.Server.MonitorCollectors.SystemData
          
     }
 
-    public class MachineDataEventData : EventDataBase
+    public class MachineDataEventData : IEventDataBase
     {
-        public override string TypeId { get; } = "MachineData";
+        public string TypeId { get; } = "MachineData";
+        public DateTime EventDt { get; set; }
 
         public decimal TotalPhys { set; get; }
 
@@ -168,14 +169,5 @@ namespace Kugar.Server.MonitorCollectors.SystemData
 
         public decimal CpuUsageRate { set; get; }
          
-        public override JObject Serialize()
-        {
-            return JObject.FromObject(this);
-        }
-
-        public override void LoadFrom(string json)
-        {
-            throw new NotImplementedException();
-        }
-    }
+   }
 }

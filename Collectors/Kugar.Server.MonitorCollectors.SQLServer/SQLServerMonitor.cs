@@ -11,6 +11,7 @@ namespace Kugar.Server.MonitorCollectors.SQLServer
     {
         private List<IFreeSql> _freeSql = new();
         private int _internal = 0;
+        private DateTime? lastQueryTime = null;
 
         public SQLServerMonitor(IServiceProvider provider) : base(provider)
         {
@@ -18,27 +19,44 @@ namespace Kugar.Server.MonitorCollectors.SQLServer
 
             var session=configuration.GetSection("SQLServer");
 
-            var timer = session["Internal"].ToInt(20000);
+            var timer = session["Internal"].ToInt(20) * 1000;
 
-            var connStrList = session.Get<List<string>>();
+            var connStrList = session.GetSection("ConnStr").Get<List<string>>();
 
             _internal = timer;
 
             foreach (var item in connStrList)
             {
-                _freeSql.Add(new FreeSqlBuilder().UseConnectionString(DataType.SqlServer,item).UseExitAutoDisposePool(true).Build());
+                try
+                {
+                    var db = new FreeSqlBuilder().UseConnectionString(DataType.SqlServer, item).UseExitAutoDisposePool(true)
+                        .Build() ;
+
+                    _freeSql.Add(db);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    throw;
+                }
+                
             }
         }
 
         protected override async Task Run(IServiceProvider serviceProvider, CancellationToken stoppingToken)
         {
             await getSlowQuery();
+
+            lastQueryTime=DateTime.Now; 
         }
 
         private async Task getSlowQuery()
         {
+            lastQueryTime ??= DateTime.Now.AddHours(-1);
+
             var sql = """
                 SELECT
+                top 100 
                     (total_elapsed_time / execution_count)/1000 N'QueryAvgElapsed'
                     ,total_elapsed_time/1000 N'总花费时间ms'
                     ,total_worker_time/1000 N'CpuTime'
@@ -46,7 +64,7 @@ namespace Kugar.Server.MonitorCollectors.SQLServer
                     ,total_logical_reads/execution_count N'每次逻辑读次数'
                     ,total_logical_reads N'逻辑读取总次数'
                     ,total_logical_writes N'逻辑写入总次数'
-                    ,execution_count N'执行次数'.
+                    ,execution_count N'执行次数' 
                     ,SUBSTRING(st.text, (qs.statement_start_offset/2) + 1,
                     ((CASE statement_end_offset
                     WHEN -1 THEN DATALENGTH(st.text)
@@ -61,16 +79,27 @@ namespace Kugar.Server.MonitorCollectors.SQLServer
                     WHEN -1 THEN DATALENGTH(st.text)
                     ELSE qs.statement_end_offset END
                     - qs.statement_start_offset)/2) + 1) not like '%fetch%'
-                    and last_execution_time between @startDt and @endDt
+                    and last_execution_time >= @startDt
                     ORDER BY 
                     total_elapsed_time / execution_count DESC;
                 """;
-
+             
             foreach (var freeSql in _freeSql)
             {
-                var data = await freeSql.Ado.QueryAsync<SQLSlowQuery>(sql);
+                try  
+                {
+                    //var dt=await freeSql.Ado.ExecuteDataTableAsync(sql);
 
-                await this.Submit(data);
+                    var data = await freeSql.Ado.QueryAsync<SQLSlowQuery>(sql, new { startDt = lastQueryTime });
+
+                    await this.Submit(data);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    throw;
+                }
+                
             }
 
 
@@ -84,9 +113,10 @@ namespace Kugar.Server.MonitorCollectors.SQLServer
     /// <summary>
     /// 慢速查询记录
     /// </summary>
-    public class SQLSlowQuery : EventDataBase
+    public class SQLSlowQuery : IEventDataBase
     {
-        public override string TypeId => "SQLServerSlowQuery";
+        public string TypeId => "SQLServerSlowQuery";
+        public DateTime EventDt { get; set; }
 
         /// <summary>
         /// 所属数据库名称
@@ -113,13 +143,9 @@ namespace Kugar.Server.MonitorCollectors.SQLServer
         /// 编译耗时
         /// </summary>
         public int CompileElapsed { set; get; }
+        
 
-        public override JObject Serialize()
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void LoadFrom(string json)
+        public void LoadFrom(string json)
         {
             throw new NotImplementedException();
         }

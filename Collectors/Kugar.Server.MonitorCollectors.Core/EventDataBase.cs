@@ -2,14 +2,17 @@
 
 namespace Kugar.Server.MonitorCollectors.Core
 {
-    public abstract class EventDataBase
+    public interface IEventDataBase
     {
-        public abstract string TypeId { get; }
+        string TypeId { get; }
 
         public DateTime EventDt { set; get; }
 
-        public abstract JObject Serialize();
+        public JObject Serialize()
+        {
+            return JObject.FromObject(this);
+        }
 
-        public abstract void LoadFrom(string json);
+        public void LoadFrom(string json){}
     }
 }
