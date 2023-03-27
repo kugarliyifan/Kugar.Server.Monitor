@@ -61,7 +61,7 @@ namespace Kugar.Server.MonitorCollectors.WindowsEvent
 
         public WindowsEventLogCollector(IServiceProvider provider) : base(provider)
         {
-            var logNames = CustomConfigManager.Default["WindowsEventLogs:Names"].ToStringEx().Split(',');
+            var logNames = CustomConfigManager.Default.GetArray<string>("WindowsEventLogs:Names");
 
             foreach (var logName in logNames)
             {

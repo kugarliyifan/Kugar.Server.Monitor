@@ -1,18 +1,15 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-	  <EnableDynamicLoading>true</EnableDynamicLoading>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="FreeSql.Provider.SqlServer" Version="3.2.692" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Kugar.Server.MonitorCollectors.Core\Kugar.Server.MonitorCollectors.Core.csproj" />
+    <PackageReference Include="FreeSql.Repository" Version="3.2.692" />
+    <PackageReference Include="Kugar.FreeSql.Extension" Version="1.0.19" />
   </ItemGroup>
 
 </Project>

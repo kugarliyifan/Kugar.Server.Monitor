@@ -10,6 +10,13 @@ namespace Kugar.Server.MonitorCollectorRunner.Submitters
 {
     public class HttpSubmitter:IDataSubmitter
     {
+        private string _url;
+
+        public HttpSubmitter(string url)
+        {
+            _url = url;
+        }
+
         public Task Submit(IEnumerable<IEventDataBase> dataList)
         {
             foreach (var item in dataList)
