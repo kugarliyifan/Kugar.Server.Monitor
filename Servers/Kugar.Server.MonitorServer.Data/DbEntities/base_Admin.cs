@@ -15,7 +15,6 @@ namespace Kugar.Server.MonitorServer.Data.DbEntities
         public string Password { set; get; }
 
         public int State { set; get; }
-
-
+         
     }
 }

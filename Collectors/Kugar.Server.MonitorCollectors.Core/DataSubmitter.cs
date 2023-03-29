@@ -11,6 +11,8 @@ namespace Kugar.Server.MonitorCollectors.Core
     public interface IDataSubmitter
     {
         Task Submit(IEnumerable<IEventDataBase> dataList);
+
+        Task Init();
     }
 
     public class DataSubmitter:IDataSubmitter
@@ -22,6 +24,11 @@ namespace Kugar.Server.MonitorCollectors.Core
                 Console.WriteLine(item.Serialize().ToStringEx(Formatting.None));
             }
              
+        }
+
+        public Task Init()
+        {
+            throw new NotImplementedException();
         }
     }
 }

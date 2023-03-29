@@ -1,6 +1,7 @@
 ﻿using Kugar.Core.Configuration;
 using Kugar.Core.ExtMethod;
 using Kugar.Server.MonitorCollectorRunner.Submitters;
+using Kugar.Server.MonitorCollectorRunner.Tasks;
 using Kugar.Server.MonitorCollectors.Core;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -29,6 +30,8 @@ namespace Kugar.Server.MonitorCollectorRunner
                     var plugins =CustomConfigManager.Default.GetArray<string>("plugins");
 
                     services.AddSingleton<IDataSubmitter, HttpSubmitter>();
+
+                    services.AddHostedService<InitHttpSubmitterTask>();
 
                     foreach (var plugin in plugins)
                     {

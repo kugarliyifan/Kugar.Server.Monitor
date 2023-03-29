@@ -21,6 +21,7 @@ using Kugar.Server.MonitorServer.Areas.API.Helpers;
 using InfluxDB.Client;
 using Kugar.Server.MonitorServer.Services;
 using FreeSql;
+using FreeSql.DataAnnotations;
 using Microsoft.AspNetCore.SignalR;
 
 namespace Kugar.Server.MonitorServer
@@ -57,14 +58,14 @@ namespace Kugar.Server.MonitorServer
                 new InfluxDBClient(CustomConfigManager.Default["InfluxDb:Conn"],
                     CustomConfigManager.Default["InfluxDb:Token"]));
 
-            var freesql = new FreeSqlBuilder().UseConnectionString(DataType.SqlServer, CustomConfigManager.Default["ConnStr"])
+            var freesql = new FreeSqlBuilder().UseConnectionString(DataType.SqlServer, CustomConfigManager.Default["Db:Connstr"])
                 .UseExitAutoDisposePool(true)
                 .UseLazyLoading(true)
-                .UseAutoSyncStructure(true)
-
-                //.UseLazyLoading(true)
+                .UseAutoSyncStructure(true) 
                 .Build();
 
+            freesql.CodeFirst.SyncStructure(typeof(MonitorDbContext).Assembly.GetTypes().Where(x => !x.IsAbstract && x.GetAttribute<TableAttribute>() != null).ToArray());
+            
             builder.Services.AddSingleton<IFreeSql>(freesql);
             builder.Services.AddScoped<MonitorDbContext>();
             builder.Services.AddScoped<UnitOfWorkManager>();
@@ -156,7 +157,7 @@ namespace Kugar.Server.MonitorServer
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
+            if (showSwagger)
             {
                 app.UseOpenApi();       // serve OpenAPI/Swagger documents
 
@@ -183,7 +184,7 @@ namespace Kugar.Server.MonitorServer
             app.UseCors();
 
             app.UseAuthorization();
-            ;
+       
 
             app.UseEndpoints(endpoints =>
             {
