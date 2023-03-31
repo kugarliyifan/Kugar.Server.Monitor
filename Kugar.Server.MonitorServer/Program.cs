@@ -176,8 +176,10 @@ namespace Kugar.Server.MonitorServer
             app.UseAuthorization()
                 .UseJsonTemplate();
             app.UseCookiePolicy();
+            
 
-            app.UseSession();
+            app.UseBlazorFrameworkFiles();
+            app.UseStaticFiles();
 
             app.UseRouting();
 
@@ -195,6 +197,8 @@ namespace Kugar.Server.MonitorServer
             });
 
             app.MapControllers();
+
+            app.MapFallbackToFile("index.html");
 
             app.Run();
         }

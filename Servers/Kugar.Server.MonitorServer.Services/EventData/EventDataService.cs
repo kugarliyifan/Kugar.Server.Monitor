@@ -14,7 +14,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Kugar.Server.MonitorServer.Services.EventData
 {
-    public class EventDataService:BaseService
+    public class EventDataService : BaseService
     {
         private static HashSet<string> _eventNameCache = new HashSet<string>(StringComparer.CurrentCultureIgnoreCase);
 
@@ -25,19 +25,28 @@ namespace Kugar.Server.MonitorServer.Services.EventData
         public async Task<ResultReturn> AddEventData(
             string eventDataType,
             Guid projectId,
+            string ipAddress,
             JObject data,
             DateTime eventDt
             )
         {
+            var server = await Server.GetServerByIpAddress(ipAddress);
+
+            if (server==null)
+            {
+                return new FailResultReturn("服务器不存在");
+            }
+
             var pointToWrite = PointData.Measurement(eventDataType)
                 .Timestamp(eventDt, WritePrecision.Ms)
-                .Tag("ProjectId",projectId.ToStringEx());
+                .Tag("ServerId", server.ServerId.ToStringEx())
+                .Tag("ProjectId", projectId.ToStringEx());
 
             foreach (var property in data.Properties())
             {
                 var value = property.Value.ToPrimitiveValue();
 
-                pointToWrite.Tag(property.Name, value.Switch(value.ToStringEx()).Case(true,"1").Case(false,"0").Result);
+                pointToWrite.Tag(property.Name, value.Switch(value.ToStringEx()).Case(true, "1").Case(false, "0").Result);
             }
 
             try
@@ -56,13 +65,13 @@ namespace Kugar.Server.MonitorServer.Services.EventData
                     {
                         await api.CreateBucketAsync(eventDataType,
                             new BucketRetentionRules(everySeconds: (long?)TimeSpan
-                                .FromDays(CustomConfigManager.Default["InfluxDb:ExpireDays"].ToInt()).TotalSeconds),
+                                .FromDays(CustomConfigManager.Default.GetValue<int>("InfluxDb:ExpireDays")).TotalSeconds),
                             CustomConfigManager.Default["InfluxDb:Org"]);
 
                         _eventNameCache.Add(eventDataType);
                     }
                 }
-                 
+
                 var writer = InfluxDbClient.GetWriteApiAsync();
 
                 await writer.WritePointAsync(pointToWrite, eventDataType, CustomConfigManager.Default["InfluxDb:Org"]);
@@ -76,5 +85,7 @@ namespace Kugar.Server.MonitorServer.Services.EventData
             return SuccessResultReturn.Default;
 
         }
+
+        public virtual ServerService Server { set; get; }
     }
 }

@@ -11,6 +11,7 @@
     <PackageReference Include="FreeSql.Repository" Version="3.2.692" />
     <PackageReference Include="InfluxDB.Client.Flux" Version="4.11.0" />
     <PackageReference Include="InfluxDB.Client.Linq" Version="4.11.0" />
+    <PackageReference Include="Kugar.Core.NetCore" Version="1.2.166" />
     <PackageReference Include="Kugar.FreeSql.Extension" Version="1.0.19" />
   </ItemGroup>
 

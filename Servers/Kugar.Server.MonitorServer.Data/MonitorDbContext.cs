@@ -29,5 +29,7 @@ namespace Kugar.Server.MonitorServer.Data
         ///  
         /// </summary>
         public virtual IBaseRepository<Mapping_AdminProject, Guid> Mapping_AdminProject { set; get; }
+
+        public virtual IBaseRepository<base_Server,Guid> base_Server { set; get; }
     }
 }

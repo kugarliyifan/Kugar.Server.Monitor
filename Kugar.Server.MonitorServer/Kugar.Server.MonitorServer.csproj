@@ -18,6 +18,7 @@
     <PackageReference Include="Kugar.Core.Web.NetCore" Version="1.0.236" />
     <PackageReference Include="Kugar.FreeSql.Extension" Version="1.0.19" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="7.0.5" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="7.0.4" />
   </ItemGroup>
 
   <ItemGroup>
@@ -31,6 +32,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Dashboard\Kugar.Server.Monitor.WebDashboard\Client\Kugar.Server.Monitor.WebDashboard.Client.csproj" />
+    <ProjectReference Include="..\Dashboard\Kugar.Server.Monitor.WebDashboard\Shared\Kugar.Server.Monitor.WebDashboard.Shared.csproj" />
     <ProjectReference Include="..\Servers\Kugar.Server.MonitorServer.Data\Kugar.Server.MonitorServer.Data.csproj" />
     <ProjectReference Include="..\Servers\Kugar.Server.MonitorServer.Services\Kugar.Server.MonitorServer.Services.csproj" />
   </ItemGroup>
