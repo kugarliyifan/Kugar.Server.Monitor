@@ -11,6 +11,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Kugar.Server.MonitorCollectors.Redis
 {
+    [ExportMonitor]
     public class RedisMonitor : UniformSubmitMonitorBase
     {
         private List<RedisClient> _connClients = new();
@@ -18,8 +19,6 @@ namespace Kugar.Server.MonitorCollectors.Redis
 
         public RedisMonitor(IServiceProvider provider) : base(provider)
         {
-            //var configuration = (IConfiguration)provider.GetService(typeof(IConfiguration));
-
             _internal = CustomConfigManager.Default.GetValue<int>("Redis:Internal");// ["Redis:Internal"].Get session["Internal"].ToInt(20) * 1000;
 
             var connStrList = CustomConfigManager.Default.GetArray<string>("Redis:ConnStr");

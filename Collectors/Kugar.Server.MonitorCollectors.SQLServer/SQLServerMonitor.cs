@@ -3,10 +3,12 @@ using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
 using System.Configuration;
 using FreeSql;
+using Kugar.Core.Configuration;
 using Kugar.Core.ExtMethod;
 
 namespace Kugar.Server.MonitorCollectors.SQLServer
 {
+    [ExportMonitor]
     public class SQLServerMonitor: UniformSubmitMonitorBase
     {
         private List<IFreeSql> _freeSql = new();
@@ -14,14 +16,10 @@ namespace Kugar.Server.MonitorCollectors.SQLServer
         private DateTime? lastQueryTime = null;
 
         public SQLServerMonitor(IServiceProvider provider) : base(provider)
-        {
-            var configuration = (IConfiguration)provider.GetService(typeof(IConfiguration));
+        { 
+            var timer =CustomConfigManager.Default.GetValue("SQLServer:Internal",20) * 1000;
 
-            var session=configuration.GetSection("SQLServer");
-
-            var timer = session["Internal"].ToInt(20) * 1000;
-
-            var connStrList = session.GetSection("ConnStr").Get<List<string>>();
+            var connStrList = CustomConfigManager.Default.GetArray<string>("SQLServer:ConnStr");
 
             _internal = timer;
 
@@ -36,8 +34,7 @@ namespace Kugar.Server.MonitorCollectors.SQLServer
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine(e);
-                    throw;
+                    continue;
                 }
                 
             }

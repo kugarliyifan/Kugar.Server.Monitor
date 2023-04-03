@@ -33,11 +33,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kugar.Server.MonitorServer.
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dashboard", "Dashboard", "{31CC96C2-AAE3-4229-87FF-1F94F8EF7482}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kugar.Server.Monitor.WebDashboard.Server", "Dashboard\Kugar.Server.Monitor.WebDashboard\Server\Kugar.Server.Monitor.WebDashboard.Server.csproj", "{20C286FB-E32D-45BC-9A5D-8A448A8E88F7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kugar.Server.Monitor.WebDashboard.Server", "Dashboard\Kugar.Server.Monitor.WebDashboard\Server\Kugar.Server.Monitor.WebDashboard.Server.csproj", "{20C286FB-E32D-45BC-9A5D-8A448A8E88F7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kugar.Server.Monitor.WebDashboard.Client", "Dashboard\Kugar.Server.Monitor.WebDashboard\Client\Kugar.Server.Monitor.WebDashboard.Client.csproj", "{6E2604E8-8970-4A37-A867-5A01806F0A14}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kugar.Server.Monitor.WebDashboard.Client", "Dashboard\Kugar.Server.Monitor.WebDashboard\Client\Kugar.Server.Monitor.WebDashboard.Client.csproj", "{6E2604E8-8970-4A37-A867-5A01806F0A14}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kugar.Server.Monitor.WebDashboard.Shared", "Dashboard\Kugar.Server.Monitor.WebDashboard\Shared\Kugar.Server.Monitor.WebDashboard.Shared.csproj", "{5B9EEF35-224C-4F6D-92BE-CC14EA6A2F43}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kugar.Server.Monitor.WebDashboard.Shared", "Dashboard\Kugar.Server.Monitor.WebDashboard\Shared\Kugar.Server.Monitor.WebDashboard.Shared.csproj", "{5B9EEF35-224C-4F6D-92BE-CC14EA6A2F43}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kugar.Server.Monitor.Collectors.IIS", "Collectors\Kugar.Server.Monitor.Collectors.IIS\Kugar.Server.Monitor.Collectors.IIS.csproj", "{B78A8792-07C1-4C25-8869-74AE48C130D5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -101,6 +103,10 @@ Global
 		{5B9EEF35-224C-4F6D-92BE-CC14EA6A2F43}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5B9EEF35-224C-4F6D-92BE-CC14EA6A2F43}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5B9EEF35-224C-4F6D-92BE-CC14EA6A2F43}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B78A8792-07C1-4C25-8869-74AE48C130D5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B78A8792-07C1-4C25-8869-74AE48C130D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B78A8792-07C1-4C25-8869-74AE48C130D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B78A8792-07C1-4C25-8869-74AE48C130D5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -121,6 +127,7 @@ Global
 		{20C286FB-E32D-45BC-9A5D-8A448A8E88F7} = {31CC96C2-AAE3-4229-87FF-1F94F8EF7482}
 		{6E2604E8-8970-4A37-A867-5A01806F0A14} = {31CC96C2-AAE3-4229-87FF-1F94F8EF7482}
 		{5B9EEF35-224C-4F6D-92BE-CC14EA6A2F43} = {31CC96C2-AAE3-4229-87FF-1F94F8EF7482}
+		{B78A8792-07C1-4C25-8869-74AE48C130D5} = {3DB7C1E5-71B0-417F-A3F4-665E0C39EB85}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A2463B78-B1A6-4304-B439-D21DD22D3CE4}
