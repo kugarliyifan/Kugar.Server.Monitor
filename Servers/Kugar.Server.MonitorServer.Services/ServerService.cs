@@ -15,7 +15,7 @@ namespace Kugar.Server.MonitorServer.Services
         {
         }
 
-        public async Task<base_Server> GetServerByIpAddress(string ipAddress)
+        public async Task<base_Server?> GetServerByIpAddress(string ipAddress)
         {
             return await DbContext.base_Server.Where(x => x.IpAddress == ipAddress).FirstAsync();
 

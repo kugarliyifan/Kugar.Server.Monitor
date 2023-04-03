@@ -2,12 +2,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Management;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using Kugar.Core.ExtMethod;
 using Newtonsoft.Json.Linq;
 using Kugar.Core.Configuration;
+using System.IO;
 
 namespace Kugar.Server.MonitorCollectors.SystemData
 {
@@ -45,47 +46,33 @@ namespace Kugar.Server.MonitorCollectors.SystemData
         /// </summary>
         /// <returns></returns>
         private IEnumerable<FolderEventData> getDiskListInfo()
-        {
-            var selectQuery = new SelectQuery("select * from win32_logicaldisk");
+        { 
+            DriveInfo[] allDrives = DriveInfo.GetDrives();
 
-            var searcher = new ManagementObjectSearcher(selectQuery);
-
-            var diskcollection = searcher.Get();
-            if (diskcollection.HasData())
+            foreach (var driveInfo in allDrives)
             {
-                foreach (ManagementObject disk in diskcollection)
+
+                if (driveInfo.DriveType!= DriveType.Fixed)
                 {
-                    int nType = Convert.ToInt32(disk["DriveType"]);
-                    if (nType != Convert.ToInt32(DriveType.Fixed))
-                    {
-                        continue;
-                    }
-                    else
-                    {
-                        yield return new FolderEventData()
-                        {
-                            EventDt = DateTime.Now,
-                            FreeSpace = Convert.ToDouble(disk["FreeSpace"]) / (1024 * 1024 * 1024),
-                            SumSpace = Convert.ToDouble(disk["Size"]) / (1024 * 1024 * 1024),
-                            Path = disk["DeviceID"].ToString()
-                        };
-
-                        //yield return (
-                        //    name: disk["DeviceID"].ToString(),
-                        //    sumSpace: Convert.ToDouble(disk["Size"]) / (1024 * 1024 * 1024),
-                        //    freeSpace: Convert.ToDouble(disk["FreeSpace"]) / (1024 * 1024 * 1024)
-                        //);
-                    }
+                    continue;
                 }
-            }
 
-        }
+                yield return new FolderEventData()
+                {
+                    EventDt = DateTime.Now,
+                    FreeSpace =Math.Round(Convert.ToDouble(driveInfo.TotalFreeSpace) / (1024 * 1024 * 1024),2) ,
+                    TotalSpace = Math.Round(Convert.ToDouble(driveInfo.TotalSize) / (1024 * 1024 * 1024),2),
+                    Path = driveInfo.Name.ToString().Replace("\\","").Replace(":",""),
+                };
+                
+            }
+        } 
 
         public class FolderEventData : IEventDataBase
         {
             public string Path { set; get; }
 
-            public double SumSpace { set; get; }
+            public double TotalSpace { set; get; }
 
             public double FreeSpace { set; get; }
 

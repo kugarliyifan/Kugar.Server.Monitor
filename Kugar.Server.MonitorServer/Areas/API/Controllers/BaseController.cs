@@ -7,7 +7,7 @@ using System.Security.Claims;
 namespace Kugar.Server.MonitorServer.Areas.API.Controllers
 {
     [Area("CollectorApi")]
-    [Authorize(AuthenticationSchemes = "CollectorApi")]
+    //[Authorize(AuthenticationSchemes = "CollectorApi")]
     //[FromBodyJson 
     [ApiExplorerSettings(GroupName = "CollectorApi")]
     [Produces("application/json")]

@@ -31,13 +31,6 @@ namespace Kugar.Server.MonitorServer
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-            builder.Host
-                .UseServiceProviderFactory(new AutofacServiceProviderFactory());
-
-            builder.Host.ConfigureAppConfiguration((builderContext, config) =>
-            {
-                config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true); // 配置可热重载
-            });
 
             builder.Host.ConfigureContainer<ContainerBuilder>(builder =>
             {
@@ -47,7 +40,21 @@ namespace Kugar.Server.MonitorServer
                     //.EnableClassInterceptors()
                     .PropertiesAutowired(wiringFlags: PropertyWiringOptions.AllowCircularDependencies);
 
+                builder.RegisterType<MonitorDbContext>()
+                    .InstancePerLifetimeScope()
+                    //.EnableClassInterceptors()
+                    .PropertiesAutowired();
             });
+
+            builder.Host
+                .UseServiceProviderFactory(new AutofacServiceProviderFactory());
+
+            builder.Host.ConfigureAppConfiguration((builderContext, config) =>
+            {
+                config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true); // 配置可热重载
+            });
+
+
 
             LoggerManager.LoggerFactory = new NLogFactory();
 
@@ -55,7 +62,7 @@ namespace Kugar.Server.MonitorServer
                 new NLoggerProviderForDI.NLoggerForDI((NLogger)LoggerManager.Default));
 
             builder.Services.AddScoped<InfluxDBClient>((s) =>
-                new InfluxDBClient(CustomConfigManager.Default["InfluxDb:Conn"],
+                new InfluxDBClient(CustomConfigManager.Default["InfluxDb:Url"],
                     CustomConfigManager.Default["InfluxDb:Token"]));
 
             var freesql = new FreeSqlBuilder().UseConnectionString(DataType.SqlServer, CustomConfigManager.Default["Db:Connstr"])
@@ -69,6 +76,7 @@ namespace Kugar.Server.MonitorServer
             builder.Services.AddSingleton<IFreeSql>(freesql);
             builder.Services.AddScoped<MonitorDbContext>();
             builder.Services.AddScoped<UnitOfWorkManager>();
+            builder.Services.AddFreeRepository();
 
             builder.Services.AddOptions();
 
@@ -136,7 +144,8 @@ namespace Kugar.Server.MonitorServer
                  LoginService = new ProjectApiLoginService(),
                  TokenEncKey = CustomConfigManager.Default["JWT:Project:Token"],
                  Audience = CustomConfigManager.Default["JWT:Project:Audience"],
-                 Issuer = CustomConfigManager.Default["JWT:Project:Issuer"]
+                 Issuer = CustomConfigManager.Default["JWT:Project:Issuer"],
+                 ExpireTimeSpan = TimeSpan.FromDays(5*30)
              })
              ;
 

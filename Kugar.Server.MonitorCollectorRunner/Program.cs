@@ -1,8 +1,10 @@
-﻿using Kugar.Core.Configuration;
+﻿using System.Runtime.InteropServices;
+using Kugar.Core.Configuration;
 using Kugar.Core.ExtMethod;
 using Kugar.Server.MonitorCollectorRunner.Submitters;
 using Kugar.Server.MonitorCollectorRunner.Tasks;
 using Kugar.Server.MonitorCollectors.Core;
+using Kugar.Server.MonitorCollectors.Core.Attributes;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -41,8 +43,27 @@ namespace Kugar.Server.MonitorCollectorRunner
 
                         var monitors = types.Where(x =>!x.IsAbstract && x.IsPublic && x.GetCustomAttributes(typeof(ExportMonitorAttribute),true).HasData());
 
-                        foreach (var monitor in monitors)
+                        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                         {
+                            monitors = monitors.Where(x =>
+                            {
+                                var attrs = x.GetAttribute<LinuxOnlyAttribute>();
+
+                                return attrs == null;
+                            });
+                        }
+                        else
+                        {
+                            monitors= monitors.Where(x =>
+                            {
+                                var attrs = x.GetAttribute<WindowOnlyAttribute>();
+
+                                return attrs == null;
+                            });
+                        }
+
+                        foreach (var monitor in monitors)
+                        { 
                             services.TryAddEnumerable(ServiceDescriptor.Singleton(typeof(IHostedService), monitor));
                         }
 

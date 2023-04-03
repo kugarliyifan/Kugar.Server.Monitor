@@ -2,14 +2,14 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Management;
+using System.Linq; 
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using Kugar.Core.Configuration;
 using Kugar.Core.ExtMethod;
 using Newtonsoft.Json.Linq;
+using Universe.CpuUsage;
 
 namespace Kugar.Server.MonitorCollectors.SystemData
 {
@@ -28,7 +28,7 @@ namespace Kugar.Server.MonitorCollectors.SystemData
         {
             try
             {
-                var cpuUsage = collectorCpuData();
+                var cpuUsage =await collectorCpuData();
                 var (totalPhys, freePhys, usagePhys) = collectMemoryData();
                
 
@@ -63,16 +63,17 @@ namespace Kugar.Server.MonitorCollectors.SystemData
         }
 
         protected override int Internal { get; } = 60 * 1000;
-
+        private MemoryMetricsClient _memoryMetricsClient=new MemoryMetricsClient();
         private (decimal totalPhys, decimal freePhys, decimal usagePhys) collectMemoryData()
         {
-            var mi = GetMemoryStatus();
+            //var mi = GetMemoryStatus();
+            var t = _memoryMetricsClient.GetMetrics();
 
-            var totalPhys = FormatSize(mi.ullTotalPhys);
-            var freePhys = FormatSize(mi.ullAvailPhys);
-            var usagePhys = FormatSize(totalPhys - freePhys);
+            //var totalPhys = FormatSize(GC.GetTotalMemory(false));
+            //var freePhys = FormatSize(GC.GetGCMemoryInfo().TotalAvailableMemoryBytes);
+            //var usagePhys = FormatSize(totalPhys - freePhys);
 
-            return (totalPhys, freePhys, usagePhys);
+            return ((decimal)t.Total, (decimal)t.Free, (decimal)t.Used);
 
             //Console.WriteLine("总内存：" + FormatSize(totalPhys ));
             //Console.WriteLine("已使用：" + FormatSize(freePhys ));
@@ -80,16 +81,33 @@ namespace Kugar.Server.MonitorCollectors.SystemData
 
         }
 
-        public decimal collectorCpuData()
-        { 
-            var counters = new PerformanceCounter[System.Environment.ProcessorCount];
-            for (int i = 0; i < counters.Length; i++)
-            {
-                counters[i] = new PerformanceCounter("Processor", "% Processor Time", i.ToString());
-                //counters[i].NextValue(); // 这里是为了获得CPU占用率的值
-            }  
+        private CpuUsage? _lastCpuUsage = null;
+        private DateTime? _lastCatchCpuDt = null;
 
-            return (decimal)counters.Select(x=>x.NextValue()).Average();
+        public async Task<decimal> collectorCpuData()
+        { 
+            //var counters = new PerformanceCounter[System.Environment.ProcessorCount];
+            //for (int i = 0; i < counters.Length; i++)
+            //{
+            //    counters[i] = new PerformanceCounter("Processor", "% Processor Time", i.ToString());
+            //    //counters[i].NextValue(); // 这里是为了获得CPU占用率的值
+            //}  
+
+            //return (decimal)counters.Select(x=>x.NextValue()).Average();
+             
+
+            var onEnd = CpuUsage.GetByThread().Value;
+
+            if (_lastCpuUsage==null)
+            {
+                _lastCatchCpuDt=DateTime.Now; 
+                _lastCpuUsage = onEnd;
+                return 0m;
+            }
+
+            return (decimal)((onEnd- _lastCpuUsage.Value).TotalMicroSeconds / (Environment.ProcessorCount * (DateTime.Now- _lastCatchCpuDt.Value).TotalSeconds))*100;
+
+            //Console.WriteLine("CPU Usage: " + (onEnd - onStart));
 
             //Console.WriteLine("电脑CPU使用率：" + cpuCounter.NextValue() + "%");
             //Console.WriteLine("电脑可使用内存：" + ramCounter.NextValue() + "MB");
@@ -100,14 +118,6 @@ namespace Kugar.Server.MonitorCollectors.SystemData
 
         
 
-        #region Win32Api调用
-        private static MEMORY_INFO GetMemoryStatus()
-        {
-            MEMORY_INFO mi = new MEMORY_INFO();
-            mi.dwLength = (uint)System.Runtime.InteropServices.Marshal.SizeOf(mi);
-            GlobalMemoryStatusEx(ref mi);
-            return mi;
-        }
 
         #region 格式化容量大小
         /// <summary>
@@ -151,7 +161,6 @@ namespace Kugar.Server.MonitorCollectors.SystemData
             public ulong ullAvailVirtual; //可用虚拟内存大小
             public ulong ullAvailExtendedVirtual; //保留 这个值始终为0
         }
-        #endregion
         #endregion
          
     }

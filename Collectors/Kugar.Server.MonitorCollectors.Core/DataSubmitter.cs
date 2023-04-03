@@ -21,7 +21,9 @@ namespace Kugar.Server.MonitorCollectors.Core
         {
             foreach (var item in dataList)
             {
-                Console.WriteLine(item.Serialize().ToStringEx(Formatting.None));
+                var data = item.Serialize().ToStringEx(Formatting.None);
+
+                Console.WriteLine(data);
             }
              
         }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,6 +10,7 @@ using InfluxDB.Client.Writes;
 using Kugar.Core.BaseStruct;
 using Kugar.Core.Configuration;
 using Kugar.Core.ExtMethod;
+using Kugar.Core.Services;
 using Kugar.Server.MonitorServer.Data;
 using Newtonsoft.Json.Linq;
 
@@ -16,7 +18,31 @@ namespace Kugar.Server.MonitorServer.Services.EventData
 {
     public class EventDataService : BaseService
     {
-        private static HashSet<string> _eventNameCache = new HashSet<string>(StringComparer.CurrentCultureIgnoreCase);
+        private static ConcurrentDictionary<string,object> _eventNameCache = new ConcurrentDictionary<string, object>(StringComparer.CurrentCultureIgnoreCase);
+        private static string _prefix;
+        private static string _orgId = "";
+        private static string _orgName = "";
+   
+        static EventDataService()
+        {
+            _prefix = CustomConfigManager.Default["InfluxDb:Prefix"];
+
+            var api=GlobalProvider.Provider.GetService<InfluxDBClient>()
+                .GetOrganizationsApi();
+
+            _orgName = CustomConfigManager.Default["InfluxDb:Org"];
+
+            var orgs = api.FindOrganizationsAsync().Result;
+
+            var org= orgs.FirstOrDefault(x => x.Name == _orgName);
+
+            if (org==null)
+            {
+                org = api.CreateOrganizationAsync(_orgName).Result;
+            }
+
+            _orgId = org.Id;
+        }
 
         public EventDataService(InfluxDBClient influxDbClient, MonitorDbContext dbContext) : base(influxDbClient, dbContext)
         {
@@ -37,44 +63,74 @@ namespace Kugar.Server.MonitorServer.Services.EventData
                 return new FailResultReturn("服务器不存在");
             }
 
+            var projectIdStr = projectId.ToStringEx();
+
             var pointToWrite = PointData.Measurement(eventDataType)
                 .Timestamp(eventDt, WritePrecision.Ms)
                 .Tag("ServerId", server.ServerId.ToStringEx())
-                .Tag("ProjectId", projectId.ToStringEx());
+                .Tag("ProjectId", projectIdStr)
+                .Field("d",false);
 
             foreach (var property in data.Properties())
             {
-                var value = property.Value.ToPrimitiveValue();
+                if (property.Name.CompareTo("EventDt",true) ||
+                    property.Name.CompareTo("ServerId", true) ||
+                    property.Name.CompareTo("ProjectId", true) ||
+                    property.Name.CompareTo("typeId", true) 
+                    )
+                {
+                    continue;
+                }
 
-                pointToWrite.Tag(property.Name, value.Switch(value.ToStringEx()).Case(true, "1").Case(false, "0").Result);
+                var value = property.Value/*.ToPrimitiveValue()*/;
+
+                if (value.Type== JTokenType.Boolean)
+                {
+                    pointToWrite = pointToWrite.Tag(property.Name, (bool)value ? "1" : "0");
+                }
+                else
+                {
+                    pointToWrite = pointToWrite.Tag(property.Name, value.ToStringEx());
+                }
+
+                //pointToWrite=pointToWrite.Tag(property.Name, value.Switch(value.ToStringEx()).Case(true, "1").Case(false, "0").Result);
             }
 
             try
             {
-                if (!_eventNameCache.Contains(eventDataType))
+                var bucketName = _prefix + eventDataType;
+
+                _eventNameCache.GetOrAdd(bucketName, name =>
                 {
                     var api = InfluxDbClient.GetBucketsApi();
 
-                    var b = await api.FindBucketByNameAsync(eventDataType);
-
-                    if (b != null)
+                    try
                     {
-                        _eventNameCache.Add(eventDataType);
+                        var b = api.FindBucketByNameAsync(name).Result;
+
+                        if (b == null)
+                        {
+                            api.CreateBucketAsync(name,
+                                new BucketRetentionRules(BucketRetentionRules.TypeEnum.Expire, 
+                                    (long?)TimeSpan
+                                    .FromDays(CustomConfigManager.Default.GetValue<int>("InfluxDb:ExpireDays"))
+                                .TotalSeconds),
+                                    _orgId)
+                                .Wait();
+                        }
                     }
-                    else
+                    catch (Exception e)
                     {
-                        await api.CreateBucketAsync(eventDataType,
-                            new BucketRetentionRules(everySeconds: (long?)TimeSpan
-                                .FromDays(CustomConfigManager.Default.GetValue<int>("InfluxDb:ExpireDays")).TotalSeconds),
-                            CustomConfigManager.Default["InfluxDb:Org"]);
-
-                        _eventNameCache.Add(eventDataType);
+                        return 1;
                     }
-                }
 
+
+                    return 1;
+                });
+                
                 var writer = InfluxDbClient.GetWriteApiAsync();
 
-                await writer.WritePointAsync(pointToWrite, eventDataType, CustomConfigManager.Default["InfluxDb:Org"]);
+                await writer.WritePointAsync(pointToWrite, bucketName, _orgName);
             }
             catch (Exception e)
             {

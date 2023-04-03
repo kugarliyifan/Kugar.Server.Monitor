@@ -12,6 +12,8 @@ using Kugar.Core.Log;
 using Kugar.Server.MonitorCollectorRunner.Helpers;
 using Kugar.Server.MonitorCollectors.Core;
 using Newtonsoft.Json;
+using Polly;
+using Polly.CircuitBreaker;
 
 namespace Kugar.Server.MonitorCollectorRunner.Submitters
 {
@@ -27,7 +29,7 @@ namespace Kugar.Server.MonitorCollectorRunner.Submitters
             var projectId = CustomConfigManager.Default["Submitter:ProjectId"];
 
             _loginUrl = $"{host}/CollectorApi/Users/Login";
-            _postDataUrl = $"{host}/CollectorApi/Project/Data/UploadData/{projectId}";
+            _postDataUrl = $"{host}/Import/Project/{projectId}/Data/UploadData";
 
         }
 
@@ -36,16 +38,37 @@ namespace Kugar.Server.MonitorCollectorRunner.Submitters
             await Task.WhenAll(dataList.Select(postData)); 
         }
 
+        private static readonly TimeSpan[] _retryTimes = new[]
+        {
+            TimeSpan.FromSeconds(10),
+            TimeSpan.FromSeconds(30),
+            TimeSpan.FromSeconds(60),
+        };
+
+        private static readonly AsyncCircuitBreakerPolicy<IFlurlResponse> _policy = Policy
+            .Handle<FlurlHttpException>()
+            .OrResult<IFlurlResponse>(r => !r.ResponseMessage.IsSuccessStatusCode)
+            .CircuitBreakerAsync(2, TimeSpan.FromMinutes(3));
+
         public async Task postData(IEventDataBase data)
         {
             var json = data.Serialize();
             json.Remove("typeId");
 
-            var response=await _postDataUrl
-                .SetQueryParam("typeId", data.TypeId)
-                .WithOAuthBearerToken(_token) 
-                .PostJsonAsync(json)
-                ;
+            var response=await _policy
+                //.WaitAndRetryAsync(_retryTimes)
+                .ExecuteAsync(() =>_postDataUrl
+                    .SetQueryParam("typeId", data.TypeId)
+                    .WithOAuthBearerToken(_token)
+                    .WithTimeout(10)
+                    .PostJsonAsync(json)) 
+                ; 
+
+            //var response=await _postDataUrl
+            //    .SetQueryParam("typeId", data.TypeId)
+            //    .WithOAuthBearerToken(_token) 
+            //    .PostJsonAsync(json)
+            //    ;
 
             var ret =await response.GetResultReturn();
 
@@ -57,6 +80,7 @@ namespace Kugar.Server.MonitorCollectorRunner.Submitters
 
         public async Task Init()
         {
+            return;
             var result=await _loginUrl
                 .PostJsonAsync(new
                 {

@@ -13,5 +13,10 @@ namespace Kugar.Server.MonitorCollectorRunner.Submitters
         {
             throw new NotImplementedException();
         }
+
+        public Task Init()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

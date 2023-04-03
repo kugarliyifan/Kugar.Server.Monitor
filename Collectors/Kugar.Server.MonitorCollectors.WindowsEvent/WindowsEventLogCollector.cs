@@ -14,7 +14,7 @@ namespace Kugar.Server.MonitorCollectors.WindowsEvent
     public class WindowsEventLogCollector:UniformSubmitMonitorBase
     {
         private List<EventLogWatcher> _watchers = new();
- 
+        private byte _logLevel = 0;
 
         protected override Task Run(IServiceProvider serviceProvider, CancellationToken stoppingToken)
         { 
@@ -33,10 +33,15 @@ namespace Kugar.Server.MonitorCollectors.WindowsEvent
             base.Dispose();
         }
 
-        private void Ew_EventRecordWritten(object? sender, EventRecordWrittenEventArgs e)
+        private async void Ew_EventRecordWritten(object? sender, EventRecordWrittenEventArgs e)
         {
             //Console.WriteLine(JsonConvert.SerializeObject(e.EventRecord));
             //Console.WriteLine(JsonConvert.SerializeObject(e.EventException));
+
+            if ((e.EventRecord?.Level??0) < this._logLevel)
+            {
+                return;
+            }
 
             var data = new WindowsEventLogEventData()
             {
@@ -53,7 +58,7 @@ namespace Kugar.Server.MonitorCollectors.WindowsEvent
                 ActivityId = e.EventRecord?.ActivityId??Guid.Empty,
             };
 
-             this.Submit(new []{data});
+             await this.Submit(new []{data});
         }
 
 
@@ -61,11 +66,13 @@ namespace Kugar.Server.MonitorCollectors.WindowsEvent
 
         public WindowsEventLogCollector(IServiceProvider provider) : base(provider)
         {
+            this._logLevel =(byte) CustomConfigManager.Default.GetValue<int>("WindowsEventLogs:Level",0);
+
             var logNames = CustomConfigManager.Default.GetArray<string>("WindowsEventLogs:Names");
 
             foreach (var logName in logNames)
             {
-                EventLogWatcher ew = new (new EventLogQuery(logName, PathType.LogName));
+                EventLogWatcher ew = new(new EventLogQuery(logName, PathType.LogName));
 
                 ew.EventRecordWritten += Ew_EventRecordWritten;
 

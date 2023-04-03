@@ -1,9 +1,9 @@
 ﻿using System.Collections.Concurrent;
 using System.Diagnostics;
-using System.Management;
 using Kugar.Core.Configuration;
 using Kugar.Core.ExtMethod;
 using Kugar.Server.MonitorCollectors.Core;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace Kugar.Server.MonitorCollectors.SystemData
@@ -60,16 +60,17 @@ namespace Kugar.Server.MonitorCollectors.SystemData
             var data=Process.GetProcesses()
                 .Where(x =>_processIds.Contains(x.ProcessName))
                 .Select(x =>
-                {
-                    using var pcCpuLoad = new PerformanceCounter("Processor", "% Processor Time", "_Total");
+                { 
+                    //using var pcCpuLoad = new PerformanceCounter("Processor", "% Processor Time", "_Total");
                     return new ProcessDataEventData()
                     {
                         MemoryUsage = Math.Round((decimal)x.WorkingSet64 /1024/1024,3) ,
                         ProcessName = x.ProcessName,
                         ProcessId = x.Id,
                         EventDt = DateTime.Now,
-                        CpuUsage = (decimal?)pcCpuLoad?.NextValue()??0m,
-                        UserName = getProcessUserName(x.Id)
+                        CPUTotal = x.TotalProcessorTime,// (decimal?)pcCpuLoad?.NextValue()??0m,
+                        UserName = x.StartInfo?.UserName,
+                        Arguments = x.StartInfo?.Arguments
                     };
                 });
 
@@ -77,9 +78,19 @@ namespace Kugar.Server.MonitorCollectors.SystemData
             {
                 var oldData = _cacheProcessLastData.TryGetValue(x.ProcessId, null);
 
+                if (oldData!=null)
+                {
+                    var cpuUsedMs = (x.CPUTotal - oldData.CPUTotal).TotalMilliseconds;
+                    var totalMsPassed = (x.EventDt - oldData.EventDt).TotalMilliseconds;
+                    var cpuUsageTotal = cpuUsedMs / (Environment.ProcessorCount * totalMsPassed);
+
+                    var cpuUsagePercentage = cpuUsageTotal * 100;
+
+                    x.CpuUsage = (decimal)cpuUsagePercentage;
+                }
+
                 return oldData == null ||
                        oldData.CpuUsage != x.CpuUsage ||
-                       oldData.MemoryUsage != x.MemoryUsage ||
                        oldData.MemoryUsage != x.MemoryUsage;
             });
 
@@ -92,32 +103,6 @@ namespace Kugar.Server.MonitorCollectors.SystemData
             
         }
         
-        private string getProcessUserName(int pID)
-        {
-            string userName = string.Empty;
- 
-            try
-            {
-                foreach (ManagementObject item in new ManagementObjectSearcher("Select * from Win32_Process WHERE processID=" + pID).Get())
-                {
-                    ManagementBaseObject inPar = null;
-                    ManagementBaseObject outPar = null;
- 
-                    inPar = item.GetMethodParameters("GetOwner");
-                    outPar = item.InvokeMethod("GetOwner", inPar, null);
- 
-                    userName = Convert.ToString(outPar["User"]);
- 
-                    break;
-                }
-            }
-            catch
-            {
-                userName = "SYSTEM";
-            }
- 
-            return userName;
-        }
 
         public override string TypeId { get; set; }
     }
@@ -137,7 +122,13 @@ namespace Kugar.Server.MonitorCollectors.SystemData
         public string UserName { set; get; }
 
         public string TypeId { get; } = "ProcessData";
+
         public DateTime EventDt { get; set; }
+
+        public string Arguments { set; get; }
+
+        [JsonIgnore]
+        public TimeSpan CPUTotal { set; get; }
         
     }
 }

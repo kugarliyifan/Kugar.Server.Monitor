@@ -1,4 +1,5 @@
-﻿using Kugar.Server.MonitorCollectors.Core;
+﻿using Kugar.Core.Serialization;
+using Kugar.Server.MonitorCollectors.Core;
 using Kugar.Server.MonitorCollectors.Redis;
 using Kugar.Server.MonitorCollectors.SQLServer;
 using Kugar.Server.MonitorCollectors.SystemData;
@@ -7,6 +8,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Serialization;
 
 namespace Kugar.MonitorCollector.Tester
 {
@@ -20,14 +23,23 @@ namespace Kugar.MonitorCollector.Tester
                     configApp.AddJsonFile("appsettings.json",false,true);
                 }).
                 ConfigureServices((hostContext, services) =>
-                { 
-
-                    services.AddSingleton<IDataSubmitter,DataSubmitter>();
-
+                {
+                    JsonConvert.DefaultSettings = () =>
+                    {
+                        return new JsonSerializerSettings()
+                        {
+                            ContractResolver = new CamelCasePropertyNamesContractResolver(),
+                            Converters = new JsonConverter[]
+                            {
+                                new GuidJsonConverter(),  
+                            }
+                        };
+                    };
+                      
                     //类似startUp
-                    //services.AddHostedService<ProcessDataMonitor>();
-                    services.AddHostedService<RedisMonitor>();
-                    //services.AddHostedService<MachineDataMonitor>();
+                    services.AddHostedService<ProcessDataMonitor>();
+                    //services.AddHostedService<RedisMonitor>();
+                   // services.AddHostedService<MachineDataMonitor>();
                     //services.AddHostedService<WindowsEventLogCollector>();
                     //services.AddHostedService<WindowsEventLogTest>();
 

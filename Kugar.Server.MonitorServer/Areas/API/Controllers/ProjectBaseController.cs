@@ -6,7 +6,7 @@ using Kugar.Core.ExtMethod;
 
 namespace Kugar.Server.MonitorServer.Areas.API.Controllers
 {
-    [Route("Import/Project/[ProjectId]/[controller]/[action]")]
+    [Route("Import/Project/{ProjectId}/{controller}/{action}")]
     public class ProjectBaseController : BaseController
     {
         [NonAction]
@@ -19,18 +19,18 @@ namespace Kugar.Server.MonitorServer.Areas.API.Controllers
 
             if (context.Result == null)
             {
-                if (context.HttpContext.GetRouteData().DataTokens.TryGetValue("ProjectId", out var projectIdStr))
+                if (context.HttpContext.GetRouteData().Values.TryGetValue("ProjectId", out var projectIdStr))
                 {
                     if (Guid.TryParseExact(projectIdStr.ToStringEx(),"N",out var projectId))
                     {
                         if (!projectId.IsEmpty())
                         {
-                            CurrentProject = projectId;
+                            CurrentProjectId = projectId;
                         }
                     } 
                 }
 
-                if (CurrentProject.IsEmpty())
+                if (CurrentProjectId.IsEmpty())
                 {
                     context.Result = new NotFoundResult();
                 }
@@ -42,10 +42,10 @@ namespace Kugar.Server.MonitorServer.Areas.API.Controllers
                     context.Result = ret.Result;
                 }
 
-            }
+            } 
 
         }
 
-        protected Guid? CurrentProject { private get; set; }
+        protected Guid CurrentProjectId {  get; private set; }
     }
 }

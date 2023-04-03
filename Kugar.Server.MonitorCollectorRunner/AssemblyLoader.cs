@@ -51,7 +51,7 @@ namespace Kugar.Server.MonitorCollectorRunner
 
         private Assembly Context_Resolving(AssemblyLoadContext context, AssemblyName assemblyName)
         {
-            string expectedPath = Path.Combine(_basePath, assemblyName + ".dll");
+            string expectedPath = Path.Combine(_basePath, assemblyName.Name + ".dll");
 
             if (File.Exists(expectedPath))
             {
