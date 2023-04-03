@@ -29,14 +29,13 @@ namespace Kugar.Server.MonitorCollectorRunner
             {
                 try
                 {
-                    using (var stream=File.OpenRead(path))
-                    {
-                        Assembly assembly = context.LoadFromStream(stream);
+                    using var stream=File.OpenRead(path);
 
-                        var types=assembly.GetTypes();
+                    var assembly = context.LoadFromStream(stream);
+
+                    var types=assembly.GetTypes();
                           
-                        return types;
-                    }
+                    return types;
                 }
                 catch (Exception e)
                 {

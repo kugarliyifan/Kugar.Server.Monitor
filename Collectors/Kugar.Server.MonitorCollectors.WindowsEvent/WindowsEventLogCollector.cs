@@ -4,6 +4,7 @@ using Kugar.Core.Configuration;
 using Kugar.Core.ExtMethod;
 using Kugar.Core.Services;
 using Kugar.Server.MonitorCollectors.Core;
+using Kugar.Server.MonitorCollectors.Core.Attributes;
 using Kugar.Server.MonitorCollectors.Core.ExtMethods;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -11,6 +12,7 @@ using Newtonsoft.Json.Linq;
 namespace Kugar.Server.MonitorCollectors.WindowsEvent
 {
     [ExportMonitor]
+    [WindowOnly]
     public class WindowsEventLogCollector:UniformSubmitMonitorBase
     {
         private List<EventLogWatcher> _watchers = new();
